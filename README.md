@@ -41,6 +41,6 @@ pytest
 
 # Switch to data that passes all tests. This data is located in data/data_pass.
 go to tests/conftest.py
-comment out line 8
-uncomment line 10
+comment out line 9
+uncomment line 11
 pytest ./tests/test_data.py or pytest
