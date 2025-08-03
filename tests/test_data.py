@@ -39,7 +39,7 @@ def test_gtn_header_changed(test_data):
     # Regex for numeric values
     digit_pattern = r"^-?\d{1,3}(,\d{3})*(\.\d+)?$|^-?\d+(\.\d+)?$"
 
-    # Check if first data row has numeric values (if it isn't a header)
+    # Check if first data row has numeric values
     has_row_digits = False
     for cell in df.loc[0]:
         val = str(cell).strip()
@@ -58,6 +58,7 @@ def test_employees_in_payrun_missing_in_gtn(test_data):
     payrun_df = pandas.read_excel(payrun_file)
     gtn_df = pandas.read_excel(gtn_file)
 
+    # Clean values
     payrun_ids = set(payrun_df["Employee ID"].dropna().astype(int).astype(str))
     gtn_ids = set(gtn_df["employee_id"].dropna().astype(int).astype(str))
 
@@ -71,6 +72,7 @@ def test_employees_in_payrun_missing_in_gtn(test_data):
 def test_employees_in_gtn_missing_in_payrun(test_data):
     gtn_file, payrun_file, _ = test_data
 
+    # Clean values
     payrun_df = pandas.read_excel(payrun_file)
     gtn_df = pandas.read_excel(gtn_file)
 
@@ -94,8 +96,8 @@ def test_gtn_elements_have_mapping(test_data):
     with open(mapping_file, "r") as f:
         json_data = json.load(f)
 
-    mappings = json_data["mappings"]
-    not_used = json_data["not_used"]
+    mappings = json_data.get("mappings")
+    not_used = json_data.get("not_used")
     no_mapping = []
 
     for pay_element in pay_elements:
@@ -103,12 +105,12 @@ def test_gtn_elements_have_mapping(test_data):
 
         # First check if pay element has mapping
         for mapping in mappings.values():
-            if mapping["vendor"] == pay_element and mapping["map"]:
+            if mapping.get("vendor") == pay_element and mapping.get("map"):
                 has_mapping = True
 
         # Then check if it is unused
         for unused in not_used:
-            if unused["vendor"] == pay_element:
+            if unused.get("vendor") == pay_element:
                 has_mapping = True
 
         if not has_mapping:
@@ -127,7 +129,7 @@ def test_payrun_elements_have_mapping(test_data):
     with open(mapping_file, "r") as f:
         json_data = json.load(f)
 
-    mappings = json_data["mappings"]
+    mappings = json_data.get("mappings")
     no_mapping = []
 
     for pay_element in pay_elements:
@@ -155,6 +157,7 @@ def test_gtn_pay_elements_have_numeric_values(test_data):
     numeric_pattern = r"^-?\d{1,3}(,\d{3})*(\.\d+)?$|^-?\d+(\.\d+)?$"
     non_numeric_columns = {}
 
+    # Check for each pay element cell if there are non-numeric values
     for col in pay_elements:
         invalid_values = []
         for val in df[col].dropna():
